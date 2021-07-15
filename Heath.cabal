@@ -21,7 +21,7 @@ source-repository head
   location:            https://github.com/TFKls/Heath.git
 common common-options
   build-depends:       base ^>= 4.13.0.0
-  
+                     , containers >= 0.6.2 && < 0.7
   ghc-options:         -Wall
                        -Wcompat
                        -Widentities
@@ -42,6 +42,8 @@ library
   import:              common-options
   hs-source-dirs:      src
   exposed-modules:     Heath
+                     , Heath.Parser
+  build-depends:       parsec >= 3.1.14 && < 3.1.15
 executable Heath
   import:              common-options
   hs-source-dirs:      app

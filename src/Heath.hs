@@ -7,9 +7,7 @@ A scheme interpreter, made to better understand Haskell
 -}
 
 module Heath
-       ( someFunc
+       (
        ) where
 
 
-someFunc :: IO ()
-someFunc = putStrLn ("someFunc" :: String)

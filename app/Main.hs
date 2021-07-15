@@ -1,7 +1,9 @@
 module Main (main) where
 
-import Heath (someFunc)
+import qualified System.IO    as IO
 
+import           Heath.Parser (interactRaw)
 
 main :: IO ()
-main = someFunc
+main = do
+  IO.interact interactExpr
