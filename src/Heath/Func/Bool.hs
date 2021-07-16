@@ -23,6 +23,8 @@ primitives = M.fromList [ ("=", makeNumBinop (==) (==))
                         , ("string>?", makeStrBinop (>))
                         , ("string<=?", makeStrBinop (<=))
                         , ("string>=?", makeStrBinop (>=))
+                        , ("eqv?", eqv)
+                        , ("eq?", eqv)
                         ]
 
 
@@ -52,3 +54,17 @@ makeNumBinop funcI funcF args
                              Right . Boolean $ funcF fst' snd'
   | T.isInteger (args !! 0) = Left $ TypeErr "Could not coerce value to Number" (args !! 1)
   | otherwise = Left $ TypeErr "Could not coerce value to Number" (args !! 0)
+
+
+eqv :: HPrimitive
+eqv [Boolean x, Boolean y]     = Right . Boolean $ x == y
+eqv [String x, String y]       = Right . Boolean $ x == y
+eqv [Integer x, Integer y]     = Right . Boolean $ x == y
+eqv [Floating x, Floating y]   = Right . Boolean $ x == y
+eqv [Atom x, Atom y]           = Right . Boolean $ x == y
+eqv [ImList xs x, ImList ys y] = eqv [List (x:xs), List (y:ys)]
+eqv [List xs, List ys] = Right . Boolean $ (length xs == length ys)
+  && (and $ zipWith (\x y -> case eqv [x,y] of { Right (Boolean val) -> val; _ -> False}) xs ys)
+eqv [_, _] = Right . Boolean $ False
+eqv ls = Left $ ArgNumErr (compare (length ls) 2) "eqv takes 2 arguments"
+
