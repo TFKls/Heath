@@ -10,6 +10,10 @@ module Heath.Func.Type
   , isImList
   , isAnyList
   , isReal
+  , asString
+  , asBoolean
+  , asInteger
+  , asFloating
   ) where
 
 import qualified Data.Map    as M
@@ -59,4 +63,18 @@ isImList (ImList _ _) = True
 isImList _            = False
 isAnyList :: IsTypeFunc
 isAnyList x = isList x || isImList x
+
+type ConvTypeFunc a = HeathVal -> Either HError a
+asString :: ConvTypeFunc String
+asString (String val) = Right val
+asString val          = Left $ TypeErr "Could not coerce value to String" val
+asBoolean :: ConvTypeFunc Bool
+asBoolean (Boolean val) = Right val
+asBoolean val           = Left $ TypeErr "Could not coerce value to Boolean" val
+asInteger :: ConvTypeFunc Integer
+asInteger (Integer val) = Right val
+asInteger val           = Left $ TypeErr "Could not coerce value to Integer" val
+asFloating :: ConvTypeFunc Double
+asFloating (Floating val) = Right val
+asFloating val           = Left $ TypeErr "Could not coerce value to Floating" val
 

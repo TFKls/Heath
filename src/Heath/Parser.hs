@@ -95,20 +95,22 @@ parseNumber :: Parser HeathVal
 parseNumber = (try parseInteger) <|> parseFloating
 
 parseList :: Parser HeathVal
-parseList = return List <*> sepBy parseExpr spaces1
+parseList = do
+  _ <- oneOf "([{"
+  x <- sepBy parseExpr spaces1
+  _ <- oneOf ")]}"
+  return . List $ x
 
 parseImList :: Parser HeathVal
 parseImList = do
+  _ <- oneOf "([{"
   head' <- endBy parseExpr spaces1
   tail' <- char '.' >> spaces1 >> parseExpr
+  _ <- oneOf ")]}"
   return $ ImList head' tail'
 
 parseAnyList :: Parser HeathVal
-parseAnyList = do
-  _ <- oneOf "([{"
-  x <- (try parseList) <|> parseImList
-  _ <- oneOf ")]}"
-  return x
+parseAnyList = (try parseList) <|> parseImList
 
 parseQuoted :: Parser HeathVal
 parseQuoted = do

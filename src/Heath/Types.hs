@@ -25,7 +25,7 @@ data HError = TypeErr String HeathVal
             | ParseErr P.ParseError
             | PrimErr String String
             | EvalErr String HeathVal
-
+            | ArgNumErr Ordering String
 toInternalErr :: HErrVal -> HeathVal
 toInternalErr (Left err)  = IntError err
 toInternalErr (Right val) = val
@@ -48,6 +48,10 @@ instance Show HError where
   show (ParseErr err)     = "ParseError:\n" ++ show err
   show (PrimErr str name) = "PrimitiveError:\n" ++ str ++ " @ " ++ name
   show (EvalErr str val)  = "EvalError:\n" ++ str ++ " " ++ show val
+  show (ArgNumErr ord ctx) = "ArgNumError:\n" ++ (case ord of
+    LT -> "Not enough arguments: "
+    EQ -> "Wrong number of arguments: "
+    GT -> "Too much arguments: ") ++ ctx
 
 showHErrVal :: HErrVal -> String -- Could make HErrVal a newtype but this works for now
 showHErrVal = show . toInternalErr
