@@ -30,6 +30,11 @@ evalRaw val@(Boolean _)            = pure val
 evalRaw (List [Atom "quote", val]) = pure val
 evalRaw (List [Atom "eval", (List [Atom "quote", val])]) = evalRaw val
 evalRaw (List [Atom "eval", val])  = evalRaw val
+evalRaw (List [Atom "if", predicate, yes]) = evalRaw (List [Atom "if", predicate, yes, List [Atom "quote", List []]])
+evalRaw (List [Atom "if", predicate, yes, no]) = evalRaw predicate >>= (\case
+                                                              Boolean False -> evalRaw no
+                                                              _          -> evalRaw yes)
+
 evalRaw (IntError err) = Left err
 evalRaw (List (Atom func : args))  = getPrim func $ map (toInternalErr . evalRaw) args
 evalRaw val@(Atom _) = pure val

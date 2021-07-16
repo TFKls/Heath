@@ -28,7 +28,7 @@ primitives = M.fromList [ ("=", makeNumBinop (==) (==))
 
 makeBinop :: (HeathVal -> Either HError a) -> (a -> a -> Bool) -> HPrimitive
 makeBinop ext func args = if length args /= 2
-  then Left $ ArgNumErr (if (length args) > 2 then GT else LT) "should be 2"
+  then Left $ ArgNumErr (compare (length args) 2) "should be 2"
   else do fst' <- ext (args !! 0)
           snd' <- ext (args !! 1)
           Right . Boolean $ func fst' snd'
@@ -43,7 +43,7 @@ makeFltBinop :: (Double -> Double -> Bool) -> HPrimitive
 makeFltBinop = makeBinop T.asFloating
 makeNumBinop :: (Integer -> Integer -> Bool) -> (Double -> Double -> Bool) -> HPrimitive
 makeNumBinop funcI funcF args
-  | length args /= 2 = Left $ ArgNumErr (if (length args) > 2 then GT else LT) "should be 2"
+  | length args /= 2 = Left $ ArgNumErr (compare (length args) 2) "should be 2"
   | all T.isInteger args = do fst' <- T.asInteger (args !! 0)
                               snd' <- T.asInteger (args !! 1)
                               Right . Boolean $ funcI fst' snd'

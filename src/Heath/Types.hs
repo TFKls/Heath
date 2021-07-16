@@ -23,7 +23,7 @@ type HPrimitive = [HeathVal] -> HErrVal
 type HErrVal = Either HError HeathVal
 data HError = TypeErr String HeathVal
             | ParseErr P.ParseError
-            | PrimErr String String
+            | FuncErr String String
             | EvalErr String HeathVal
             | ArgNumErr Ordering String
 toInternalErr :: HErrVal -> HeathVal
@@ -46,7 +46,7 @@ instance Show HeathVal where
 instance Show HError where
   show (TypeErr str val)  = "TypeError:\n" ++ str ++ " "++ show val
   show (ParseErr err)     = "ParseError:\n" ++ show err
-  show (PrimErr str name) = "PrimitiveError:\n" ++ str ++ " @ " ++ name
+  show (FuncErr str name) = "PrimitiveError:\n" ++ str ++ " @ " ++ name
   show (EvalErr str val)  = "EvalError:\n" ++ str ++ " " ++ show val
   show (ArgNumErr ord ctx) = "ArgNumError:\n" ++ (case ord of
     LT -> "Not enough arguments: "

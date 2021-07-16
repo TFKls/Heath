@@ -49,6 +49,7 @@ library
                      , Heath.Func.Number
                      , Heath.Func.Type
                      , Heath.Func.Bool
+                     , Heath.Func.List
   build-depends:       parsec >= 3.1.14 && < 3.1.15
 executable Heath
   import:              common-options
