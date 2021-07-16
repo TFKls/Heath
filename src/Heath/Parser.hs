@@ -10,16 +10,16 @@ module Heath.Parser
        ( interactRaw
        , readRaw
        , showRaw
-       , HeathVal (..)
+       , readExpr
        ) where
 
-import           Control.Monad         (join)
 import           Data.Foldable         (foldl')
 import           Data.Functor.Identity (Identity)
-import           Data.List             (intercalate)
 import           Numeric               (readHex, readOct)
 
 import           Text.Parsec
+
+import           Heath.Types
 
 -- |
 -- Definition is the same as in Parsec library,
@@ -38,14 +38,6 @@ type Parser = ParsecT [Char] () Identity
 -- !@#$%^&*<>:=?~+-*/|
 symbol :: Parser Char
 symbol = oneOf "!@#$%^&*<>:=?~+-*/|"
-
-data HeathVal = Atom String
-              | List [HeathVal]
-              | ImList [HeathVal] HeathVal
-              | Integer Integer
-              | String String
-              | Boolean Bool
-              | Floating Double
 
 spaces1 :: Parser ()
 spaces1 = skipMany1 space
@@ -83,7 +75,8 @@ parseInteger :: Parser HeathVal
 parseInteger = do pref <- oneOf "#0123456789"
                   if pref /= '#' then
                     do
-                      x <- many1 (oneOf "0123456789")
+                      x <- many (oneOf "0123456789")
+                      _ <- lookAhead . noneOf $ "e."
                       return . Integer . read $ pref : x
                     else do
                       radix <- oneOf "bodx"
@@ -93,13 +86,13 @@ parseInteger = do pref <- oneOf "#0123456789"
                           'b' -> foldl' (\acc c -> (acc*2)+read [c]) 0
                           'o' -> fst . (!! 0) . readOct
                           'x' -> fst . (!! 0) . readHex
-                          '_' -> read) $ pref : x
+                          _   -> read) $ pref : x
 
 parseFloating :: Parser HeathVal
 parseFloating = many1 (oneOf ".e0123456789") >>= (return . Floating . read)
 
 parseNumber :: Parser HeathVal
-parseNumber = parseInteger <|> parseFloating
+parseNumber = (try parseInteger) <|> parseFloating
 
 parseList :: Parser HeathVal
 parseList = return List <*> sepBy parseExpr spaces1
@@ -143,27 +136,21 @@ parseQQuotedList = do
 parseExpr :: Parser HeathVal
 parseExpr = parseAtom
             <|> parseString
-            <|> parseNumber
+            <|> (try parseNumber)
+            <|> parseQuoted
             <|> (try parseQQuotedList)
             <|> parseAnyList
 
 readRaw :: String -> Either ParseError HeathVal
 readRaw = parse parseExpr "Heath"
 
-showRaw :: HeathVal -> String
-showRaw expr = case expr of
-  String val                   -> show val
-  Atom val                     -> val
-  Boolean val                  -> '#' : if val then "t" else "f"
-  Integer val                  -> show val
-  Floating val                 -> show val
-  List [Atom "quote", rest]    -> '\'' : (showRaw rest)
-  List val -> '(' : unwords (map showRaw val) ++ ")"
-  ImList head' tail' -> '(' : unwords (map showRaw head')
-    ++ " . " ++ showRaw tail' ++ ")"
+readExpr :: String -> HErrVal
+readExpr s = case readRaw s of
+  Left err    -> Left . ParseErr $ err
+  (Right val) -> Right val
 
-instance Show HeathVal where
-  show = showRaw
+showRaw :: HeathVal -> String
+showRaw = show
 
 interactRaw :: String -> String
 interactRaw x = case readRaw x of

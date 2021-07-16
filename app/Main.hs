@@ -1,9 +1,9 @@
 module Main (main) where
 
-import qualified System.IO    as IO
+import qualified System.IO  as IO
 
-import           Heath.Parser (interactRaw)
+import           Heath.Eval (evalInteractive)
 
 main :: IO ()
 main = do
-  IO.interact interactExpr
+  IO.interact evalInteractive
