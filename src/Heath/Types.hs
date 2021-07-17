@@ -1,9 +1,10 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Heath.Types (
   HeathVal (..)
   , HPrimitive
   , HErrVal
   , HError (..)
-  , toInternalErr
   , showHErrVal
   ) where
 
@@ -16,8 +17,7 @@ data HeathVal = Atom String
               | String String
               | Boolean Bool
               | Floating Double
-              | IntError HError
-
+              deriving (Eq)
 
 type HPrimitive = [HeathVal] -> HErrVal
 type HErrVal = Either HError HeathVal
@@ -26,9 +26,6 @@ data HError = TypeErr String HeathVal
             | FuncErr String String
             | EvalErr String HeathVal
             | ArgNumErr Ordering String
-toInternalErr :: HErrVal -> HeathVal
-toInternalErr (Left err)  = IntError err
-toInternalErr (Right val) = val
 
 instance Show HeathVal where
   show expr = case expr of
@@ -41,8 +38,6 @@ instance Show HeathVal where
     List val -> '(' : unwords (map show val) ++ ")"
     ImList head' tail' -> '(' : unwords (map show head')
       ++ " . " ++ show tail' ++ ")"
-    IntError err -> show err
-
 instance Show HError where
   show (TypeErr str val)  = "TypeError:\n" ++ str ++ " "++ show val
   show (ParseErr err)     = "ParseError:\n" ++ show err
@@ -54,5 +49,7 @@ instance Show HError where
     GT -> "Too much arguments: ") ++ ctx
 
 showHErrVal :: HErrVal -> String -- Could make HErrVal a newtype but this works for now
-showHErrVal = show . toInternalErr
+showHErrVal = \case
+  Left err  -> show err
+  Right val -> show val
 

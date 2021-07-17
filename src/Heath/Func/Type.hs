@@ -14,6 +14,10 @@ module Heath.Func.Type
   , asBoolean
   , asInteger
   , asFloating
+  , asAtom
+  , weakAsString
+  , weakAsBoolean
+  , weakAsFloating
   ) where
 
 import qualified Data.Map    as M
@@ -77,4 +81,29 @@ asInteger val           = Left $ TypeErr "Could not coerce value to Integer" val
 asFloating :: ConvTypeFunc Double
 asFloating (Floating val) = Right val
 asFloating val           = Left $ TypeErr "Could not coerce value to Floating" val
+asAtom :: ConvTypeFunc String
+asAtom (Atom val) = Right val
+asAtom val        = Left $ TypeErr "Could not coerce value to Atom" val
 
+
+weakAsString :: ConvTypeFunc String
+weakAsString (String val) = Right val
+weakAsString (Integer val) = Right $ show val
+weakAsString (Floating val) = Right $ show val
+weakAsString (Boolean val) = Right $ if val then "#t" else "#f"
+weakAsString (Atom val) = Right val
+weakAsString val          = Left $ TypeErr "Could not coerce value to String" val
+weakAsBoolean :: ConvTypeFunc Bool
+weakAsBoolean (Boolean val) = Right val
+weakAsBoolean (String val) = case val of
+                               "#t" -> Right True
+                               "#T" -> Right True
+                               "#f" -> Right False
+                               "#F" -> Right False
+                               _ -> Left $ TypeErr "Could not coerce value to Boolean" (String val)
+weakAsBoolean (Integer val) = Right $ val /= 0
+weakAsBoolean val           = Left $ TypeErr "Could not coerce value to Boolean" val
+weakAsFloating :: ConvTypeFunc Double
+weakAsFloating (Floating val) = Right val
+weakAsFloating (Integer val) = Right $ fromIntegral val
+weakAsFloating val           = Left $ TypeErr "Could not coerce value to Floating" val

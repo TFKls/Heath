@@ -1,8 +1,10 @@
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE LambdaCase                #-}
+{-# LANGUAGE RankNTypes                #-}
 
 module Heath.Func.Bool
-  (  primitives  ) where
+  ( primitives
+  , eqv ) where
 
 import qualified Data.Map        as M
 
@@ -25,6 +27,7 @@ primitives = M.fromList [ ("=", makeNumBinop (==) (==))
                         , ("string>=?", makeStrBinop (>=))
                         , ("eqv?", eqv)
                         , ("eq?", eqv)
+                        , ("equal?", equal)
                         ]
 
 
@@ -68,3 +71,27 @@ eqv [List xs, List ys] = Right . Boolean $ (length xs == length ys)
 eqv [_, _] = Right . Boolean $ False
 eqv ls = Left $ ArgNumErr (compare (length ls) 2) "eqv takes 2 arguments"
 
+data AsTypeFunc = forall a. Eq a => AnyATF (HeathVal -> Either HError a)
+
+primEqual :: HeathVal -> HeathVal -> AsTypeFunc -> Bool
+primEqual x y (AnyATF func) = case (do x' <- func x
+                                       y' <- func y
+                                       Right $ x' == y') of
+                                Left _    -> False
+                                Right val -> val
+
+atfs :: [AsTypeFunc]
+atfs = [AnyATF T.weakAsBoolean, AnyATF T.asInteger, AnyATF T.weakAsFloating, AnyATF T.weakAsString, AnyATF T.asAtom]
+
+equal :: HPrimitive
+equal [List xs, List ys] = Right . Boolean $ (length xs == length ys) && and (map (\(x, y) -> (\case
+                                                                     Right x' -> x'
+                                                                     Left _ -> False) $ T.asBoolean =<< equal [x,y]) (zip xs ys))
+equal [ImList xs x, ImList ys y] = do
+  xys <- equal [x,y] >>= T.asBoolean
+  xy <- equal [List xs, List ys] >>= T.asBoolean
+  Right . Boolean $ xy && xys
+
+equal [x, y] = Right . Boolean . or $ map (primEqual x y) atfs
+
+equal ls = Left $ ArgNumErr (compare (length ls) 2) "equal takes 2 arguments"
