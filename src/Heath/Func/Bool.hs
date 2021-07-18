@@ -1,6 +1,11 @@
+{- |
+Copyright: (c) 2021 Tomasz "TFKls" Kulis
+SPDX-License-Identifier: GPL-3.0-only
+Maintainer: Tomasz "TFKls" Kulis <tfk@tfkls.dev>
+-}
+
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE LambdaCase                #-}
-{-# LANGUAGE RankNTypes                #-}
 
 module Heath.Func.Bool
   ( primitives
@@ -42,10 +47,10 @@ makeBoolBinop :: (Bool -> Bool -> Bool) -> HPrimitive
 makeBoolBinop = makeBinop T.asBoolean
 makeStrBinop :: (String -> String -> Bool) -> HPrimitive
 makeStrBinop = makeBinop T.asString
-makeIntBinop :: (Integer -> Integer -> Bool) -> HPrimitive
-makeIntBinop = makeBinop T.asInteger
-makeFltBinop :: (Double -> Double -> Bool) -> HPrimitive
-makeFltBinop = makeBinop T.asFloating
+_makeIntBinop :: (Integer -> Integer -> Bool) -> HPrimitive
+_makeIntBinop = makeBinop T.asInteger
+_makeFltBinop :: (Double -> Double -> Bool) -> HPrimitive
+_makeFltBinop = makeBinop T.asFloating
 makeNumBinop :: (Integer -> Integer -> Bool) -> (Double -> Double -> Bool) -> HPrimitive
 makeNumBinop funcI funcF args
   | length args /= 2 = Left $ ArgNumErr (compare (length args) 2) "should be 2"

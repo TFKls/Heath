@@ -1,11 +1,14 @@
-{-# LANGUAGE LambdaCase #-}
+{- |
+Copyright: (c) 2021 Tomasz "TFKls" Kulis
+SPDX-License-Identifier: GPL-3.0-only
+Maintainer: Tomasz "TFKls" Kulis <tfk@tfkls.dev>
+-}
 
 module Heath.Func.List
   (  primitives  ) where
 
-import qualified Data.Map        as M
+import qualified Data.Map    as M
 
-import qualified Heath.Func.Type as T
 import           Heath.Types
 
 primitives :: M.Map String HPrimitive

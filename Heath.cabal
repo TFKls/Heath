@@ -42,12 +42,14 @@ library
   import:              common-options
   hs-source-dirs:      src
   exposed-modules:     Heath
+  other-modules:       Heath.Types
+                     , Heath.Repl
                      , Heath.Parser
-                     , Heath.Types
                      , Heath.Eval
-  other-modules:       Heath.Func
+                     , Heath.Func
                      , Heath.Func.Number
                      , Heath.Func.Type
+                     , Heath.Func.System
                      , Heath.Func.Bool
                      , Heath.Func.List
   build-depends:       parsec >= 3.1.14 && < 3.1.15

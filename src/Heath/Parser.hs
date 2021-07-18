@@ -4,8 +4,6 @@ SPDX-License-Identifier: GPL-3.0-only
 Maintainer: Tomasz "TFKls" Kulis <tfk@tfkls.dev>
 -}
 
-{-# LANGUAGE OverloadedStrings #-}
-
 module Heath.Parser
        ( interactRaw
        , readRaw

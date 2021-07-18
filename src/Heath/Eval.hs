@@ -4,20 +4,16 @@ SPDX-License-Identifier: GPL-3.0-only
 Maintainer: Tomasz "TFKls" Kulis <tfk@tfkls.dev>
 -}
 
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Heath.Eval
   ( eval
   , evalInteractive
   ) where
 
-import           Data.List       (foldl')
 
-import           Heath.Func      (getPrim)
-import           Heath.Func.Bool (eqv)
-import qualified Heath.Func.Type as T
-import           Heath.Parser    (readExpr)
+import           Heath.Func   (getPrim)
+import           Heath.Parser (readExpr)
 import           Heath.Types
 
 eval :: HErrVal -> HErrVal
@@ -33,14 +29,16 @@ evalRaw val@(Boolean _)            = pure val
 evalRaw (List [Atom "quote", val]) = pure val
 evalRaw (List [Atom "eval", (List [Atom "quote", val])]) = evalRaw val
 evalRaw (List [Atom "eval", val])  = evalRaw val
+evalRaw (List [Atom "if"]) = Left $ EvalErr "Incorrect `if` form: no predicate provided" $ List []
+evalRaw (List [Atom "if", _]) = Left $ EvalErr "Incorrect `if` form: no consequence provided" $ List []
 evalRaw (List [Atom "if", predicate, yes]) = evalRaw (List [Atom "if", predicate, yes, List [Atom "quote", List []]])
-evalRaw (List [Atom "if", predicate, yes, no]) = evalRaw predicate >>= (\case
-                                                              Boolean False -> evalRaw no
-                                                              _          -> evalRaw yes)
+evalRaw (List [Atom "if", predicate, yes, no]) =
+  evalRaw predicate >>= (\case
+                            Boolean False -> evalRaw no
+                            _             -> evalRaw yes)
 evalRaw (List (Atom "cond" : rest)) = evalCond rest
 evalRaw (List [Atom "case"]) = evalCaseError "case cannot be empty" $ List []
 evalRaw (List [Atom "case", _]) = evalCaseError "case needs to contain at least one clause" $ List []
-evalRaw (List (Atom "case" : case' : rest)) = evalCase case' rest
 evalRaw (List (Atom "case" : case' : rest)) = evalCase case' rest
 evalRaw (List (Atom func : args))  = mapM evalRaw args >>= getPrim func
 -- evalRaw val@(Atom _) = pure val

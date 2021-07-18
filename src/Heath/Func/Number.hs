@@ -1,5 +1,10 @@
+{- |
+Copyright: (c) 2021 Tomasz "TFKls" Kulis
+SPDX-License-Identifier: GPL-3.0-only
+Maintainer: Tomasz "TFKls" Kulis <tfk@tfkls.dev>
+-}
+
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE RankNTypes #-}
 
 module Heath.Func.Number
   (  primitives  ) where
@@ -27,8 +32,8 @@ makeIntBinop func args = if all T.isInteger args
                                                                       _         -> 0 {-should be unreachable-}) args)
                          else Left $ TypeErr "Mismatched types for numeric operator" (List args)
 
-makeFltBinop :: (Double -> Double -> Double) -> HPrimitive
-makeFltBinop func args = if all T.isFloating args
+_makeFltBinop :: (Double -> Double -> Double) -> HPrimitive
+_makeFltBinop func args = if all T.isFloating args
                          then Right . Floating $ foldl1' func (map (\case
                                                                        Floating x -> x
                                                                        _          -> 0 {-should be unreachable-}) args)

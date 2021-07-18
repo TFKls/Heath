@@ -6,8 +6,8 @@ Maintainer: Tomasz "TFKls" Kulis <tfk@tfkls.dev>
 A scheme interpreter, made to better understand Haskell
 -}
 
-module Heath
-       (
-       ) where
+module Heath ( runRepl ) where
+
+import           Heath.Repl (runRepl)
 
 

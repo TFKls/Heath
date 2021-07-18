@@ -1,3 +1,9 @@
+{- |
+Copyright: (c) 2021 Tomasz "TFKls" Kulis
+SPDX-License-Identifier: GPL-3.0-only
+Maintainer: Tomasz "TFKls" Kulis <tfk@tfkls.dev>
+-}
+
 module Heath.Func.Type
   ( primitives
   , isString

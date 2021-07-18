@@ -1,4 +1,11 @@
-{-# LANGUAGE LambdaCase #-}
+{- |
+Copyright: (c) 2021 Tomasz "TFKls" Kulis
+SPDX-License-Identifier: GPL-3.0-only
+Maintainer: Tomasz "TFKls" Kulis <tfk@tfkls.dev>
+-}
+
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE LambdaCase         #-}
 
 module Heath.Types (
   HeathVal (..)
@@ -17,7 +24,7 @@ data HeathVal = Atom String
               | String String
               | Boolean Bool
               | Floating Double
-              deriving (Eq)
+              deriving stock (Eq)
 
 type HPrimitive = [HeathVal] -> HErrVal
 type HErrVal = Either HError HeathVal
