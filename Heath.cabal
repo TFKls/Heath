@@ -15,12 +15,13 @@ build-type:          Simple
 extra-doc-files:     README.md
                      CHANGELOG.md
 tested-with:         GHC == 8.8.3
+                   , GHC == 8.10.4
 
 source-repository head
   type:                git
   location:            https://github.com/TFKls/Heath.git
 common common-options
-  build-depends:       base ^>= 4.13.0.0
+  build-depends:       base >= 4.13.0.0 && < 4.15.0.0
                      , containers >= 0.6.2 && < 0.7
   ghc-options:         -Wall
                        -Wcompat
