@@ -1,6 +1,6 @@
 cabal-version:       2.4
 name:                Heath
-version:             0.0.0.0
+version:             0.0.0.1
 synopsis:            A scheme interpreter, made to better understand Haskell
 description:         A scheme interpreter, made to better understand Haskell
 homepage:            https://github.com/TFKls/Heath
