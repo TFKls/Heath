@@ -1,2 +1,3 @@
 # Code of Conduct
-1. Don't be a (prick/dick/jerk/asshole/idiot/another synonym etc.).
+1. Don't be a dick
+2. Keep the trolling to a minimum
